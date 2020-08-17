@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Util\StringUtil;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * SystemName : Bulletinboard
@@ -46,7 +47,7 @@ class PostController extends Controller
     public function index()
     {
         $postList = $this->postInterface->getPostList();
-        $message = $this->postInterface->getAvailbleMessage($postList);
+        $message = $this->postInterface->getAvailableMessage($postList);
         return view('post.postlist') -> with('postList', $postList) -> with('message', $message);
     }
 
@@ -74,7 +75,27 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('post.addpost');
+        $post = new Post();
+        return view('post.addpost')->with('duplicate', false)->with('post', $post);
+    }
+
+    /**
+     * Display confirm resource to store into storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function confirmCreate(Request $request)
+    {
+        $validator = Validator::make($request -> all(), [
+            'title' => ['required', 'string', 'max:255'], 
+            'description' => ['required', 'string']]);
+        if ($validator->fails()) 
+            return redirect() -> route('posts.addPost') -> withErrors($validator) -> withInput();
+        else {
+            $post = $this->postInterface->saveDataToPost($request);
+            return view('post.confirmcreate') -> with('post', $post);
+        }
     }
 
     /**
@@ -85,14 +106,15 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request -> all(), [
-            'title' => ['required', 'string', 'max:255', 'unique:posts'], 
-            'description' => ['required', 'string']]);
-        if ($validator->fails()) 
-            return redirect() -> route('posts.addPost') -> withErrors($validator) -> withInput();
-        else
-            $post = $this->postInterface->saveDataToPost($request);
-            return view('post.confirmcreate') -> with('post', $post);
+        $duplicate = $this->postInterface->isDuplicateTitle($request);
+        $post = $this->postInterface->saveDataToPost($request);
+        if ($duplicate) {
+            return view('post.addpost') -> with('duplicate', $duplicate) -> with('post', $post);
+        }
+        else {
+            $this->postInterface->savePost($post);
+            return redirect() -> route('posts');
+        }
     }
 
     /**
@@ -114,7 +136,27 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        //
+        $post = Post::find($id);
+        return view('post.editpost')->with('duplicate', false)->with('post', $post);
+    }
+
+    /**
+     * Display confirm resource to update post.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function confirmEdit(Request $request, $id)
+    {
+        $validator = Validator::make($request -> all(), [
+            'title' => ['required', 'string', 'max:255'], 
+            'description' => ['required', 'string']]);
+        if ($validator->fails()) 
+            return redirect() -> route('posts.editPost') -> withErrors($validator) -> withInput();
+        else {
+            $post = $this->postInterface->saveDataToUpdate($request, $id);
+            return view('post.confirmedit') -> with('post', $post);
+        }
     }
 
     /**
@@ -126,7 +168,20 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $duplicate = $this->postInterface->isDuplicateTitle($request);    
+        $post = $this->postInterface->saveDataToPost($request);
+        $postFormRequest = $this->postInterface->getPostByTitle($request->input('title'));
+        echo($postFormRequest->id."");     
+        echo($id);   
+        echo($duplicate && $postFormRequest->id."" != $id);
+        if ($duplicate && $postFormRequest->id."" != $id) {
+            $postFormRequest->id = $id;
+            return view('post.editpost') -> with('duplicate', $duplicate) -> with('post', $postFormRequest);
+        }
+        else {
+            $post = $this->postInterface->updatePost($request, $id);
+            return redirect() -> route('posts');
+        }
     }
 
     /**
@@ -138,17 +193,6 @@ class PostController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * Display confirm resouce to store into storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function showConfirm(Request $request)
-    {
-        return view('post.confirmcreate');
     }
 
 }

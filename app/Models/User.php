@@ -36,7 +36,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'type', 'phone', 'dob', 'address',
     ];
 
     /**
@@ -47,5 +47,17 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function isAdmin() 
+    {
+        return $this->type;
+    }
+
+     /**
+     * Get the user record associated with post.
+     */
+    public function user() {
+        return $this -> belongsTo('App\Models\User', 'create_user_id', 'id');
+    }
 
 }

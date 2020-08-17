@@ -42,7 +42,7 @@ interface PostServiceInterface
    * @param postList
    * @return message
    */
-  public function getAvailbleMessage($postList);
+  public function getAvailableMessage($postList);
 
   /**
    * Set Form Request Data into Array to show Post Create Confirmation Page
@@ -51,6 +51,40 @@ interface PostServiceInterface
    * @return Array
    */
   public function saveDataToPost($request);
+
+  /**
+   * Set Form Request Data into Array to show Post Update Confirmation Page
+   * 
+   * @param request
+   * @return User
+   */
+  public function saveDataToUpdate($request, $id);
+
+  /**
+   * Check Method Title of Post Duplicated or Not
+   * 
+   * @param request
+   * @return boolean
+   */
+  public function isDuplicateTitle($request);
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  Post
+   * @return \Illuminate\Http\Response
+   */ 
+  public function savePost($post);
+
+  public function updatePost($request, $id);
+
+  /**
+   * Get Post By Title 
+   * 
+   * @param title
+   * @return Post
+   */
+  public function getPostByTitle($title);
 }
 
 ?>

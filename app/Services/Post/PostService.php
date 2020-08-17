@@ -16,6 +16,7 @@ namespace App\Services\Post;
 use App\Contracts\Services\Post\PostServiceInterface;
 use App\Contracts\Dao\Post\PostDaoInterface;
 use App\Models\Post;
+use App\Util\StringUtil;
 
 /**
  * SystemName : Bulletinboard
@@ -63,11 +64,11 @@ class PostService implements PostServiceInterface
    * @param postList
    * @return message
    */
-  public function getAvailbleMessage($postList) 
+  public function getAvailableMessage($postList)
   {
     $message = "";
     if (count($postList) <= 0)
-    $message = 'No post available!';
+      $message = 'No post available!';
     return $message;
   }
 
@@ -81,11 +82,66 @@ class PostService implements PostServiceInterface
   {
     $title = $request->input('title');
     $description = $request->input('description');
-    $post = [
-      'title' => $title,
-      'description' => $description,
-    ]; 
+    $post = new Post();
+    $post -> title = $title;
+    $post -> description = $description; 
     return $post;
+  }
+
+  /**
+   * Set Form Request Data into Array to show Post Update Confirmation Page
+   * 
+   * @param request
+   * @return Post
+   */
+  public function saveDataToUpdate($request, $id)
+  {
+    $title = $request->input('title');
+    $description = $request->input('description');
+    $post = Post::find($id);
+    $post -> title = $title;
+    $post -> description = $description; 
+    return $post;
+  }
+
+  /**
+   * Check Method Title of Post Duplicated or Not
+   * 
+   * @param request
+   * @return boolean
+   */
+  public function isDuplicateTitle($request)
+  {
+    if (StringUtil::isNotEmpty($this->postDao->getPostByTitle($request->input('title')))) {
+      return true;
+    }
+    else false;
+  }
+
+  /**
+   * Get Post By Title 
+   * 
+   * @param title
+   * @return Post
+   */
+  public function getPostByTitle($title) {
+    return $this->postDao->getPostByTitle($title);
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  Post
+   * @return \Illuminate\Http\Response
+   */  
+  public function savePost($post) 
+  {
+    $this->postDao->savePost($post);
+  }
+
+  public function updatePost($request, $id)
+  {
+    $this->postDao->updatePost($request, $id);
   }
 }
 ?>

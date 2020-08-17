@@ -33,5 +33,23 @@ interface PostDaoInterface
    * @return postList
    */
   public function getSearchPosts($q);
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  Post
+   * @return \Illuminate\Http\Response
+   */
+  public function savePost($post);
+
+  /**
+   * Get Post By Title 
+   * 
+   * @param title
+   * @return Post
+   */
+  public function getPostByTitle($title);
+
+  public function updatePost($request, $id);
 }
 ?>

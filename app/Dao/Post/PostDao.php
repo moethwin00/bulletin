@@ -15,6 +15,7 @@ namespace App\Dao\Post;
 
 use App\Contracts\Dao\Post\PostDaoInterface;
 use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * SystemName : Bulletinboard
@@ -27,8 +28,13 @@ class PostDao implements PostDaoInterface
    *
    * @return postList
    */
-  public function getPostList() {
-    return Post::paginate(2);
+  public function getPostList() 
+  {
+    if (Auth::check()) {
+      $postList = (Auth::user()->isAdmin())? Post::paginate(1): Post::where('create_user_id', Auth::user()->id)->paginate(1);
+    }
+    else $postList = Post::where('status', '1')->paginate(1);
+    return $postList;
   }
 
   /**
@@ -37,9 +43,43 @@ class PostDao implements PostDaoInterface
    * @param searchQuery
    * @return postList
    */
-  public function getSearchPosts($q) {
+  public function getSearchPosts($q) 
+  {
     $postList = Post::where('title', 'LIKE', '%'.$q.'%') -> orWhere('description', 'LIKE', '%'.$q.'%') -> get();
     return $postList;
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  Post
+   * @return \Illuminate\Http\Response
+   */
+  public function savePost($post) 
+  {
+    $post -> create_user_id = Auth::user() -> id;
+    $post -> updated_user_id = Auth::user() -> id;
+    $post -> save();
+  }
+
+  public function updatePost($request, $id)
+  {
+    $post = Post::find($id);
+    $post -> title = $request->input('title');
+    $post -> description = $request->input('description');
+    $post -> updated_user_id = Auth::user() -> id;
+    $post -> save();  
+  }
+
+  /**
+   * Get Post By Title 
+   * 
+   * @param title
+   * @return Post
+   */
+  public function getPostByTitle($title)
+  {
+    return Post::where('title', $title) -> first();
   }
 }
 ?>

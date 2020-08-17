@@ -1,0 +1,7 @@
+@charset "UTF-8";
+
+/* create confirm text */
+p.txt-confirm {
+  padding-top: calc(0.375rem + 1px);
+  padding-bottom: calc(0.375rem + 1px);
+}
