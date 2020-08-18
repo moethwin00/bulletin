@@ -17,7 +17,10 @@ use App\Contracts\Services\User\UserServiceInterface;
 use App\Contracts\Dao\User\UserDaoInterface;
 use App\Models\User;
 use App\Util\StringUtil;
+
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 /**
  * SystemName : Bulletinboard
@@ -89,8 +92,14 @@ class UserService implements UserServiceInterface
     $user -> phone = $request -> input('phone');
     $user -> dob = $request -> input('dob');
     $user -> address = $request -> input('address');
+    $profile = $request -> file('profile');
+    $extension = $profile -> getClientOriginalExtension();
+    Storage::disk('public')->put($profile->getFilename().'.'.$extension, File::get($profile));
+    $user -> profile = $profile->getFilename().'.'.$extension;
     return $user;
   }
+
+  
 
   // /**
   //  * Set Form Request Data into Array to show Post Update Confirmation Page
@@ -132,16 +141,16 @@ class UserService implements UserServiceInterface
   //   return $this->postDao->getPostByTitle($title);
   // }
 
-  // /**
-  //  * Store a newly created resource in storage.
-  //  *
-  //  * @param  Post
-  //  * @return \Illuminate\Http\Response
-  //  */  
-  // public function savePost($post) 
-  // {
-  //   $this->postDao->savePost($post);
-  // }
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request
+   * @return \Illuminate\Http\Response
+   */  
+  public function saveUser($request) 
+  {
+    $this->userDao->saveUser($request);
+  }
 
   // public function updatePost($request, $id)
   // {

@@ -31,7 +31,7 @@ class UserDao implements UserDaoInterface
    */
   public function getUserList() 
   {
-    $userList = User::paginate(1);
+    $userList = User::paginate(7);
     return $userList;
   }
 
@@ -43,24 +43,46 @@ class UserDao implements UserDaoInterface
    */
   public function getSearchUsers($name, $email, $createdfrom, $createdto)
   {
-    $userList = User::where('name', 'LIKE', '%'.$name.'%') 
-                -> orWhere('email', 'LIKE', '%'.$email.'%')
-                -> orWhereBetween('created_at', [$createdfrom, $createdto]) -> get();
+    $user= User::query();
+    if (StringUtil::isNotEmpty($name)) {
+      $user -> where('name', 'LIKE', '%'.$name.'%');
+    }
+    if (StringUtil::isNotEmpty($email)) {
+      $user -> where('email', 'LIKE', '%'.$email.'%');
+    }
+    if (StringUtil::isNotEmpty($createdfrom) && StringUtil::isEmptyString($createdto)) {
+      $user -> where('created_at', '>=', $createdfrom);
+    }
+    if (StringUtil::isEmptyString($createdfrom) && StringUtil::isNotEmpty($createdto)) {
+      $user -> where('created_at', '<=', $createdto);
+    }
+    if (StringUtil::isNotEmpty($createdfrom) && StringUtil::isNotEmpty($createdto)) {
+      $user -> whereBetween('created_at', [$createdfrom, $createdto]);
+    }
+    
+    $userList = $user -> get();
     return $userList;
   }
 
-  // /**
-  //  * Store a newly created resource in storage.
-  //  *
-  //  * @param  Post
-  //  * @return \Illuminate\Http\Response
-  //  */
-  // public function savePost($post) 
-  // {
-  //   $post -> create_user_id = Auth::user() -> id;
-  //   $post -> updated_user_id = Auth::user() -> id;
-  //   $post -> save();
-  // }
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request
+   * @return \Illuminate\Http\Response
+   */
+  public function saveUser($request) 
+  {
+    User::create([
+      'name' => $request->input('name'),
+      'email' => $request->input('email'),
+      'password' => $request->input('password'),
+      'type' => $request->input('type'),
+      'phone' => $request->input('phone'),
+      'dob' => $request->input('dob'),
+      'address' => $request->input('address'),
+      'profile' => $request->input('profile'),
+      ]);
+  }
 
   // public function updatePost($request, $id)
   // {

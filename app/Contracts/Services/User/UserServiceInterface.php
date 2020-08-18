@@ -52,6 +52,14 @@ interface UserServiceInterface
    */
   public function saveDataToUser($request);
 
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request
+   * @return \Illuminate\Http\Response
+   */ 
+  public function saveUser($request);
+
   // /**
   //  * Check Method Title of Post Duplicated or Not
   //  * 
@@ -59,14 +67,6 @@ interface UserServiceInterface
   //  * @return boolean
   //  */
   // public function isDuplicateTitle($request);
-
-  // /**
-  //  * Store a newly created resource in storage.
-  //  *
-  //  * @param  Post
-  //  * @return \Illuminate\Http\Response
-  //  */ 
-  // public function savePost($post);
 
   // public function updatePost($request, $id);
 

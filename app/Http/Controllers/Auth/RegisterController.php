@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use App\Contracts\Services\Auth\AuthServiceInterface;
+use App\Util\StringUtil;
 
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -35,13 +37,19 @@ class RegisterController extends Controller
     protected $redirectTo = RouteServiceProvider::POSTS;
 
     /**
+     * AuthInterface Declaration to access Business Logic for System
+     */
+    private $authInterface;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(AuthServiceInterface $authInterface)
     {
         $this->middleware('auth');
+        $this->authInterface = $authInterface;
     }
 
      /**
@@ -75,22 +83,32 @@ class RegisterController extends Controller
         ]);
     }
 
-    /**
+        /**
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
      * @return \App\User
      */
-    protected function create(array $data)
+    protected function create(Request $request)
     {
+        $existenceUser = $this->authInterface->getUserByEmail($request->input('email'));
+        if (StringUtil::isNotEmpty($existenceUser)) {
+            return view('auth.register') -> with('duplicate', true) -> with('user', $existenceUser);
+        }
+        else
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'type' => $data['type'],
-            'phone' => $data['phone'],
-            'dob' => $data['dob'],
-            'address' => $data['address'],
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'type' => $request->input('type'),
+            'phone' => $request->input('phone'),
+            'dob' => $request->input('dob'),
+            'address' => $request->input('address'),
         ]);
+    }
+
+    public function showRegistrationForm()
+    {
+        return view('auth.register') -> with('duplicate', false);
     }
 }

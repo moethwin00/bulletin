@@ -34,6 +34,14 @@ interface UserDaoInterface
    */
   public function getSearchUsers($name, $email, $createdfrom, $createdto);
 
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request
+   * @return \Illuminate\Http\Response
+   */ 
+  public function saveUser($request);
+
   // /**
   //  * Get Post By Title 
   //  * 

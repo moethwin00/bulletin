@@ -13,13 +13,13 @@
             <input type="text" class="form-control" name="name" placeholder="Name" value="@if(isset($name)) {{ $name }} @endif">
           </div>
           <div class="col-lg-3 col-md-6 col-12 mb-2">
-            <input type="email" class="form-control" name="email" placeholder="Email" value="@if(isset($email)) {{ $email }} @endif">
+            <input type="text" class="form-control" name="email" placeholder="Email" value="@if(isset($email)) {{ $email }} @endif">
           </div>
           <div class="col-lg-3 col-md-6 col-12 mb-2">
-            <input type="date" class="form-control" name="createdfrom" placeholder="Created From" value="@if(isset($createdfrom)) {{ $createdfrom }} @endif">
+            <input type="date" class="form-control" name="createdfrom" placeholder="Created From" value=@if(isset($createdfrom)) {{ $createdfrom }} @endif>
           </div>
           <div class="col-lg-3 col-md-6 col-12 mb-2">
-            <input type="date" class="form-control" name="createdto" placeholder="Created To" value="@if(isset($createdto)) {{ $createdto }} @endif">
+            <input type="date" class="form-control" name="createdto" placeholder="Created To" value=@if(isset($createdto)) {{ $createdto }} @endif>
           </div>
           <div class="col-lg-3 col-md-3 col-4 mb-2"><input type="submit" class="btn btn-primary display-block w-100 pd-2" value="Search"></div>
           @auth
@@ -58,8 +58,7 @@
                     <td>{{ $user -> created_at }}</td>
                     <td>{{ $user -> updated_at }}</td>
                     @auth
-                    {{-- {{ route('posts.editPost', $post -> id) }} --}}
-                      <td><a href="#" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> Edit</a></td>
+                      <td><a href="{{ route('users.editUser', $user->id) }}" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> Edit</a></td>
                       <td><a href="#" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</td>
                     @endauth
                   </tr>

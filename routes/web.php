@@ -40,4 +40,10 @@ Route::post('/users/search', 'User\UserController@search') -> name('users.search
 
 Route::post('/users/confirmcreate', 'User\UserController@confirmCreate') -> name('users.confirmCreate') -> middleware('auth');
 
+Route::post('/users/register', 'User\UserController@store') -> name('users.register') -> middleware('auth');
+
+Route::get('/users/{id}/edit', 'User\UserController@edit') -> name('users.editUser') -> middleware('auth');
+
+Route::post('/users/{id}/confirmedit', 'User\UserController@confirmEdit') -> name('users.confirmEdit') -> middleware('auth');
+
 ?>

@@ -36,7 +36,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'type', 'phone', 'dob', 'address',
+        'name', 'email', 'password', 'type', 'phone', 'dob', 'address', 'profile',
     ];
 
     /**
@@ -58,6 +58,14 @@ class User extends Authenticatable
      */
     public function user() {
         return $this -> belongsTo('App\Models\User', 'create_user_id', 'id');
+    }
+
+    /**
+     * Get the user’s profile image
+     */
+    public function getImageAttribute()
+    {
+        return $this->profile_image;
     }
 
 }

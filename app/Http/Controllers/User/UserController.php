@@ -12,13 +12,17 @@
 
 namespace App\Http\Controllers\User;
 
-use Illuminate\Http\Request;
 use App\Contracts\Services\User\UserServiceInterface;
+use App\Contracts\Services\Auth\AuthServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Util\StringUtil;
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 /**
  * SystemName : Bulletinboard
@@ -32,12 +36,18 @@ class UserController extends Controller
     private $userInterface;
 
     /**
+     * AuthInterface Declaration to access Business Logic for System
+     */
+    private $authInterface;
+
+    /**
      * Create a new controller instance
      * 
      * @return void
      */
-    public function __construct(UserServiceInterface $userInterface) {
+    public function __construct(UserServiceInterface $userInterface, AuthServiceInterface $authInterface) {
         $this->userInterface = $userInterface;
+        $this->authInterface = $authInterface;
     }
 
     /**
@@ -86,6 +96,15 @@ class UserController extends Controller
      */
     public function confirmCreate(Request $request)
     {
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|regex:/^(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/',
+            'password-confirm' => 'required',
+            'type' => 'required',
+            'profile' => 'required',
+        ]);
+        \App\Form::create($validatedData);
         $user = $this->userInterface->saveDataToUser($request);
         return view('user.confirmcreate') -> with('user', $user);
     }
@@ -107,7 +126,14 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $existenceUser = $this->authInterface->getUserByEmail($request->input('email'));
+        if (StringUtil::isNotEmpty($existenceUser)) {
+            return view('auth.register') -> with('duplicate', true) -> with('user', $existenceUser);
+        }
+        else {
+            $this->userInterface->saveUser($request);
+            return redirect()-> route('users');
+        }
     }
 
     /**
@@ -129,7 +155,28 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::find($id);
+        return view('user.edituser')->with('duplicate', false)->with('user', $user);
+    }
+
+    /**
+     * Display confirm resource to update user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function confirmEdit(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|regex:/^(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/',
+            'password-confirm' => 'required',
+            'type' => 'required',
+        ]);
+        \App\Form::create($validatedData);
+        $user = $this->userInterface->saveDataToUser($request);
+        return view('user.confirmedit') -> with('user', $user);
     }
 
     /**
