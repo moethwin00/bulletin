@@ -38,5 +38,8 @@ class CreatePostsTable extends Migration
         Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('posts');
         Schema::enableForeignKeyConstraints();
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 }

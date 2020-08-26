@@ -19,37 +19,63 @@ namespace App\Contracts\Dao\User;
  */
 interface UserDaoInterface 
 {
-  /**
-   * Get User List
-   *
-   * @return userList
-   */
-  public function getUserList();
+    /**
+     * Get User List
+     *
+     * @return userList
+     */
+    public function getUserList();
 
-  /**
-   * Get Userr By Search Keywords 
-   * 
-   * @param searchQuery
-   * @return userList
-   */
-  public function getSearchUsers($name, $email, $createdfrom, $createdto);
+    /**
+     * Get A Specific User
+     *
+     * @param int $id
+     * @return user
+     */
+    public function getUser($id);
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request
-   * @return \Illuminate\Http\Response
-   */ 
-  public function saveUser($request);
+    /**
+     * Get Userr By Search Keywords 
+     * 
+     * @param string $name
+     * @param string $email
+     * @param Date $createdfrom
+     * @param Date $createdto
+     * @return userList
+     */
+    public function getSearchUsers($name, $email, $createdfrom, $createdto);
 
-  // /**
-  //  * Get Post By Title 
-  //  * 
-  //  * @param title
-  //  * @return Post
-  //  */
-  // public function getPostByTitle($title);
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */ 
+    public function saveUser($request);
 
-  // public function updatePost($request, $id);
+    /**
+     * Get User By Email 
+     * 
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email);
+    
+    /**
+     * Update User
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateUser($request, $id);
+
+    /**
+     * Delete A Specific User
+     *
+     * @param App\Models\User $user
+     * @return
+     */
+    public function deleteUser($user);
 }
 ?>

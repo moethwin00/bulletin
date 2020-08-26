@@ -24,27 +24,39 @@ use App\Util\StringUtil;
  */
 class AuthService implements AuthServiceInterface
 {
-  private $authDao;
+    private $authDao;
 
-  /**
-   * Class Constructor
-   * 
-   * @param OperatorAuthDaoInterface
-   * @return
-   */
-  public function __construct(AuthDaoInterface $authDao)
-  {
-    $this->authDao = $authDao;
-  }
+    /**
+     * Class Constructor
+     * 
+     * @param OperatorAuthDaoInterface $authDao
+     * @return
+     */
+    public function __construct(AuthDaoInterface $authDao)
+    {
+        $this->authDao = $authDao;
+    }
 
-  /**
-   * Get Post List
-   *
-   * @return User
-   */
-  public function getUserByEmail($email)
-  {
-    return $this->authDao->getUserByEmail($email);
-  }
+    /**
+     * Get Post List
+     *
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email)
+    {
+        return $this->authDao->getUserByEmail($email);
+    }
+
+    /**
+    * Change User Password
+     * 
+     * @param User $user
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword($user, $request) {
+        $user = $this->authDao->changePassword($user, $request);
+    }
 }
 ?>

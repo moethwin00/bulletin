@@ -6,7 +6,7 @@
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <form action="{{ route('users.search') }}" method="POST" role="search">
+      <form action="{{ route('users#search') }}" method="POST" role="search">
         {{ csrf_field() }}
         <div class="row">
           <div class="col-lg-3 col-md-6 col-12 mb-2">
@@ -58,8 +58,27 @@
                     <td>{{ $user -> created_at }}</td>
                     <td>{{ $user -> updated_at }}</td>
                     @auth
-                      <td><a href="{{ route('users.editUser', $user->id) }}" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> Edit</a></td>
-                      <td><a href="#" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</td>
+                      <td><a href="{{ route('users#edit', $user->id) }}" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> Edit</a></td>
+                      <td><a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete-user{{$user->id}}"><i class="fa fa-trash"></i> Delete</td>
+                      <div class="modal fade" id="delete-user{{$user->id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header border-0 bg-danger text-white">
+                              <h5 class="modal-title"><i class="fa fa-trash"> Delete User!</i></h5>
+                              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              Are you sure to delete this record?
+                            </div>
+                            <div class="modal-footer border-0">
+                              <a href="{{ route('users#delete', $user->id) }}" type="button" class="btn btn-danger">Confirm</a>
+                              <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     @endauth
                   </tr>
                 @endforeach

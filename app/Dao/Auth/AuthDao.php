@@ -15,7 +15,7 @@ namespace App\Dao\Auth;
 
 use App\Contracts\Dao\Auth\AuthDaoInterface;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * SystemName : Bulletinboard
@@ -23,15 +23,28 @@ use Illuminate\Support\Facades\Auth;
  */
 class AuthDao implements AuthDaoInterface 
 {
-  /**
-   * Get User By Email
-   *
-   * @return User
-   */
-  public function getUserByEmail($email) 
-  {
-    $user = User::where('email', $email)->first();
-    return $user;
-  }
+    /**
+     * Get User By Email
+     *
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email) 
+    {
+        $user = User::where('email', $email)->first();
+        return $user;
+    }
+
+    /**
+    * Change User Password
+     * 
+     * @param User $user
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword($user, $request) {
+        $user->password = Hash::make($request->password);
+        $user->update();
+    }
 }
 ?>

@@ -28,133 +28,176 @@ use Illuminate\Support\Facades\File;
  */
 class UserService implements UserServiceInterface
 {
-  private $userDao;
+    private $userDao;
 
-  /**
-   * Class Constructor
-   * 
-   * @param OperatorUserDaoInterface
-   * @return
-   */
-  public function __construct(UserDaoInterface $userDao)
-  {
-    $this->userDao = $userDao;
-  }
+    /**
+     * Class Constructor
+     * 
+     * @param OperatorUserDaoInterface $userDao
+     * @return
+     */
+    public function __construct(UserDaoInterface $userDao)
+    {
+        $this->userDao = $userDao;
+    }
 
-  /**
-   * Get User List
-   *
-   * @return userList
-   */
-  public function getUserList()
-  {
-    return $this->userDao->getUserList();
-  }
+    /**
+     * Get User List
+     *
+     * @return userList
+     */
+    public function getUserList()
+    {
+        return $this->userDao->getUserList();
+    }
 
-  /**
-   * Get User By Search Keywords 
-   * 
-   * @param searchQuery
-   * @return userList
-   */
-  public function getSearchUsers($name, $email, $createdfrom, $createdto)
-  {
-    return $this->userDao->getSearchUsers($name, $email, $createdfrom, $createdto);
-  }
+    /**
+     * Get A Specific User
+     *
+     * @param int $id
+     * @return user
+     */
+    public function getUser($id) {
+        return $this->userDao->getUser($id);
+    }
 
-  /**
-   * Get User available or not Message
-   * 
-   * @param userList
-   * @return message
-   */
-  public function getAvailableMessage($userList)
-  {
-    $message = "";
-    if (count($userList) <= 0)
-      $message = 'No User available!';
-    return $message;
-  }
+    /**
+     * Get User By Search Keywords 
+     * 
+     * @param string $name
+     * @param string $email
+     * @param string $createdfrom
+     * @param string $createdtp
+     * @return userList
+     */
+    public function getSearchUsers($name, $email, $createdfrom, $createdto)
+    {
+        return $this->userDao->getSearchUsers($name, $email, $createdfrom, $createdto);
+    }
 
-  /**
-   * Set Form Request Data into Array to show User Create Confirmation Page
-   * 
-   * @param request
-   * @return User
-   */
-  public function saveDataToUser($request)
-  {
-    $user = new User();
-    $user -> name = $request -> input('name');
-    $user -> email = $request -> input('email'); 
-    $user -> password = Hash::make( $request -> input('password'));
-    $user -> type = $request -> input('type');
-    $user -> phone = $request -> input('phone');
-    $user -> dob = $request -> input('dob');
-    $user -> address = $request -> input('address');
-    $profile = $request -> file('profile');
-    $extension = $profile -> getClientOriginalExtension();
-    Storage::disk('public')->put($profile->getFilename().'.'.$extension, File::get($profile));
-    $user -> profile = $profile->getFilename().'.'.$extension;
-    return $user;
-  }
+    /**
+     * Get User available or not Message
+     * 
+     * @param List<User> $userList
+     * @return message
+     */
+    public function getAvailableMessage($userList)
+    {
+        $message = "";
+        if (count($userList) <= 0)
+            $message = 'No User available!';
+        return $message;
+    }
 
-  
+    /**
+     * Set Form Request Data into Array to show User Create Confirmation Page
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return User
+     */
+    public function saveDataToUser($request)
+    {
+        $user = new User();
+        $user -> name = $request -> input('name');
+        $user -> email = $request -> input('email'); 
+        $user -> password = Hash::make( $request -> input('password'));
+        $user -> type = $request -> input('type');
+        $user -> phone = $request -> input('phone');
+        $user -> dob = $request -> input('dob');
+        $user -> address = $request -> input('address');
+        $profile = $request -> file('profile');
+        if (StringUtil::isNotEmpty($profile)) {
+            $extension = $profile -> getClientOriginalExtension();
+            Storage::disk('public')->put($profile->getFilename().'.'.$extension, File::get($profile));
+            $user -> profile = $profile->getFilename().'.'.$extension;
+        }
+        return $user;
+    }
 
-  // /**
-  //  * Set Form Request Data into Array to show Post Update Confirmation Page
-  //  * 
-  //  * @param request
-  //  * @return Array
-  //  */
-  // public function saveDataToUpdate($request, $id)
-  // {
-  //   $title = $request->input('title');
-  //   $description = $request->input('description');
-  //   $post = Post::find($id);
-  //   $post -> title = $title;
-  //   $post -> description = $description; 
-  //   return $post;
-  // }
+    /**
+     * Set Form Request Data into Array to show User Update Confirmation Page
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return User
+     */
+    public function saveDataToUpdate($request, $id)
+    {
+        $user = User::find($id);
+        $user -> name = $request -> input('name');
+        $user -> email = $request -> input('email'); 
+        $user -> type = $request -> input('type');
+        $user -> phone = $request -> input('phone');
+        $user -> dob = $request -> input('dob');
+        $user -> address = $request -> input('address');
+        if ($request->hasFile('profile')) {
+            $oldImage = $user -> profile;
+            $exists = Storage::disk('public')->exists($oldImage);
+            if($exists){
+                Storage::disk('public')->delete($oldImage);
+            }
+            $profile = $request -> file('profile');
+            $extension = $profile -> getClientOriginalExtension();
+            Storage::disk('public')->put($profile->getFilename().'.'.$extension, File::get($profile));
+            $user -> profile = $profile->getFilename().'.'.$extension; 
+        }
+        return $user;
+    }
 
-  // /**
-  //  * Check Method Title of Post Duplicated or Not
-  //  * 
-  //  * @param request
-  //  * @return boolean
-  //  */
-  // public function isDuplicateTitle($request)
-  // {
-  //   if (StringUtil::isNotEmpty($this->postDao->getPostByTitle($request->input('title')))) {
-  //     return true;
-  //   }
-  //   else false;
-  // }
+    /**
+     * Check Method Email of User Duplicated or Not
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return boolean
+     */
+    public function isDuplicateUser($request)
+    {
+        if (StringUtil::isNotEmpty($this->userDao->getUserByEmail($request->input('email')))) {
+            return true;
+        }
+        else false;
+    }
 
-  // /**
-  //  * Get Post By Title 
-  //  * 
-  //  * @param title
-  //  * @return Post
-  //  */
-  // public function getPostByTitle($title) {
-  //   return $this->postDao->getPostByTitle($title);
-  // }
+    /**
+     * Get User By Email 
+     * 
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email) {
+        return $this->userDao->getUserByEmail($email);
+    }
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request
-   * @return \Illuminate\Http\Response
-   */  
-  public function saveUser($request) 
-  {
-    $this->userDao->saveUser($request);
-  }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */  
+    public function saveUser($request) 
+    {
+        $this->userDao->saveUser($request);
+    }
+    
+    /**
+     * Update User
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateUser($request, $id)
+    {
+        $this->userDao->updateUser($request, $id);
+    }
 
-  // public function updatePost($request, $id)
-  // {
-  //   $this->postDao->updatePost($request, $id);
-  // }
+    /**
+     * Delete A Specific User
+     *
+     * @param App\Models\User $user
+     * @return
+     */
+    public function deleteUser($user) {
+        $this->userDao->deleteUser($user);
+    }
 }
 ?>

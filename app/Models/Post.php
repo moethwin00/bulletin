@@ -1,24 +1,28 @@
 <?php
-
 /**
- * Post Model
+ * Model file
  *
- * Post Model associated with posts table
+ * Model Associated with database tables
  *
- * @category   Post
- * @package    App\Models
- * @author     Original Author <moethwinoo>
+ * @author     Moe Thwin Oo <scm.moethwinoo@gmail.com>
+ * @copyright  Seattle Consulting Myanmar
+ * @version    1.0
+ * @since      File available since Release 1.0
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * SystemName : Bulletinboard
- * ModuleName : Post
+ * Description : Post Model associated with posts table
  */
 class Post extends Model
 {
+    use SoftDeletes;
+
     /**
      * The table associated with the Post Model
      *

@@ -1,27 +1,30 @@
 <?php
-
 /**
- * User Model
+ * Model file
  *
- * User Model associated with users table
+ * Model Associated with database tables
  *
- * @category   User
- * @package    App\Models
- * @author     Original Author <moethwinoo>
+ * @author     Moe Thwin Oo <scm.moethwinoo@gmail.com>
+ * @copyright  Seattle Consulting Myanmar
+ * @version    1.0
+ * @since      File available since Release 1.0
  */
+
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * SystemName : Bulletinboard
- * ModuleName : User
+ * Description : User Model associated with users table
  */
 class User extends Authenticatable
 {
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The table associated with the User model
@@ -50,10 +53,11 @@ class User extends Authenticatable
 
     public function isAdmin() 
     {
-        return $this->type;
+        $admin = ($this->type == "0")? true: false;
+        return $admin;
     }
 
-     /**
+    /**
      * Get the user record associated with post.
      */
     public function user() {

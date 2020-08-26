@@ -39,10 +39,6 @@
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-.right {
-  right: 0;
-}
-
 *,
 *::before,
 *::after {
@@ -420,6 +416,12 @@ h5,
 h6,
 .h6 {
   font-size: 0.9rem;
+}
+
+.profile {
+  width: 150px;
+  min-height: 150px;
+  max-height: 150px;
 }
 
 .lead {

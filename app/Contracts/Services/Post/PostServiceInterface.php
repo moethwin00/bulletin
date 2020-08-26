@@ -21,70 +21,101 @@ namespace App\Contracts\Services\Post;
 interface PostServiceInterface 
 {
 
-  /**
-   * Get Post List
-   *
-   * @return postList
-   */
-  public function getPostList();
+    /**
+     * Get Post List
+     *
+     * @return postList
+     */
+    public function getPostList();
 
-  /**
-   * Get Post By Search Keyword 
-   * 
-   * @param searchQuery
-   * @return postList
-   */
-  public function getSearchPosts($q);
+    /**
+     * Get A Specific Post
+     *
+     * @param int $id
+     * @return Post
+     */
+    public function getPost($id);
 
-  /**
-   * Get Post available or not Message
-   * 
-   * @param postList
-   * @return message
-   */
-  public function getAvailableMessage($postList);
+    /**
+     * Get Post By Search Keyword 
+     * 
+     * @param string $q
+     * @return postList
+     */
+    public function getSearchPosts($q);
 
-  /**
-   * Set Form Request Data into Array to show Post Create Confirmation Page
-   * 
-   * @param request
-   * @return Array
-   */
-  public function saveDataToPost($request);
+    /**
+     * Get Post available or not Message
+     * 
+     * @param List<Post> $postList
+     * @return message
+     */
+    public function getAvailableMessage($postList);
 
-  /**
-   * Set Form Request Data into Array to show Post Update Confirmation Page
-   * 
-   * @param request
-   * @return User
-   */
-  public function saveDataToUpdate($request, $id);
+    /**
+     * Set Form Request Data into Array to show Post Create Confirmation Page
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return Array
+     */
+    public function saveDataToPost($request);
 
-  /**
-   * Check Method Title of Post Duplicated or Not
-   * 
-   * @param request
-   * @return boolean
-   */
-  public function isDuplicateTitle($request);
+    /**
+     * Set Form Request Data into Array to show Post Update Confirmation Page
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return User
+     */
+    public function saveDataToUpdate($request, $id);
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  Post
-   * @return \Illuminate\Http\Response
-   */ 
-  public function savePost($post);
+    /**
+     * Check Method Title of Post Duplicated or Not
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return boolean
+     */
+    public function isDuplicateTitle($request);
 
-  public function updatePost($request, $id);
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Post $post
+     * @return \Illuminate\Http\Response
+     */ 
+    public function savePost($post);
+    
+    /**
+     * Update Post
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePost($request, $id);
 
-  /**
-   * Get Post By Title 
-   * 
-   * @param title
-   * @return Post
-   */
-  public function getPostByTitle($title);
+    /**
+     * Delete A Specific Post
+     *
+     * @param App\Models\Post $post
+     * @return
+     */
+    public function deletePost($post);
+
+    /**
+     * Get Post By Title 
+     * 
+     * @param string $title
+     * @return Post
+     */
+    public function getPostByTitle($title);
+
+    /**
+     * Download method for downloading posts with excel format
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function download();
 }
 
 ?>

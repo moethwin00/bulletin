@@ -19,37 +19,60 @@ namespace App\Contracts\Dao\Post;
  */
 interface PostDaoInterface 
 {
-  /**
-   * Get Post List
-   *
-   * @return postList
-   */
-  public function getPostList();
+    /**
+     * Get Post List
+     *
+     * @return postList
+     */
+    public function getPostList();
 
-  /**
-   * Get Post By Search Keyword 
-   * 
-   * @param searchQuery
-   * @return postList
-   */
-  public function getSearchPosts($q);
+    /**
+     * Get A Specific Post
+     *
+     * @param int $id
+     * @return Post
+     */
+    public function getPost($id);
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  Post
-   * @return \Illuminate\Http\Response
-   */
-  public function savePost($post);
+    /**
+     * Get Post By Search Keyword 
+     * 
+     * @param string $q
+     * @return postList
+     */
+    public function getSearchPosts($q);
 
-  /**
-   * Get Post By Title 
-   * 
-   * @param title
-   * @return Post
-   */
-  public function getPostByTitle($title);
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Post $post
+     * @return \Illuminate\Http\Response
+     */
+    public function savePost($post);
 
-  public function updatePost($request, $id);
+    /**
+     * Get Post By Title 
+     * 
+     * @param string $title
+     * @return Post
+     */
+    public function getPostByTitle($title);
+    
+    /**
+     * Update Post
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePost($request, $id);
+
+    /**
+     * Delete A Specific Post
+     *
+     * @param App\Models\Post $post
+     * @return
+     */
+    public function deletePost($post);
 }
 ?>

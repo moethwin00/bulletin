@@ -19,11 +19,21 @@ namespace App\Contracts\Dao\Auth;
  */
 interface AuthDaoInterface 
 {
-  /**
-   * Get User By Email
-   *
-   * @return User
-   */
-  public function getUserByEmail($email);
+    /**
+     * Get User By Email
+     *
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email);
+
+    /**
+     * Change User Password
+     * 
+     * @param User $user
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword($user, $request);
 }
 ?>

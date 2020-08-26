@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * SystemName : Bulletinboard
@@ -100,22 +101,11 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required|confirmed|regex:/^(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/',
-            'password-confirm' => 'required',
+            'password_confirmation' => 'required',
             'type' => 'required',
-            'profile' => 'required',
         ]);
-        \App\Form::create($validatedData);
         $user = $this->userInterface->saveDataToUser($request);
         return view('user.confirmcreate') -> with('user', $user);
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -132,19 +122,8 @@ class UserController extends Controller
         }
         else {
             $this->userInterface->saveUser($request);
-            return redirect()-> route('users');
+            return redirect()-> route('users#index');
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -155,7 +134,11 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
+        $user = $this->userInterface->getUser($id);
+        if (Gate::allows('isUser')) {
+            if ($id != Auth::user()->id)
+                return redirect('/');
+        }
         return view('user.edituser')->with('duplicate', false)->with('user', $user);
     }
 
@@ -167,15 +150,11 @@ class UserController extends Controller
      */
     public function confirmEdit(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|regex:/^(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/',
-            'password-confirm' => 'required',
-            'type' => 'required',
-        ]);
-        \App\Form::create($validatedData);
-        $user = $this->userInterface->saveDataToUser($request);
+        $user = $this->userInterface->saveDataToUpdate($request, $id);
+        if (Gate::allows('isUser')) {
+            if ($id != Auth::user()->id)
+                return redirect('/');
+        }
         return view('user.confirmedit') -> with('user', $user);
     }
 
@@ -188,17 +167,43 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $duplicate = $this->userInterface->isDuplicateUser($request);    
+        $userFormRequest = $this->userInterface->getUserByEmail($request->input('email'));
+        if ($duplicate && $userFormRequest->id."" != $id) {
+            $userFormRequest->id = $id;
+            return view('user.edituser') -> with('duplicate', $duplicate) -> with('user', $userFormRequest);
+        }
+        else {
+            $user = $this->userInterface->updateUser($request, $id);
+            if (Gate::allows('isUser')) {
+                return redirect('/');
+            }
+            else {
+                return redirect() -> route('users#index');
+            }
+        }
+    }
+    
+    /**
+     * Display showProfile resource to show user Profile.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showProfile() {
+        $user = Auth::user();
+        return view('user.userprofile') -> with('user', $user);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft delte specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        $user = $this->userInterface->getUser($id);
+        $this->userInterface->deleteUser($user);
+        return redirect()->back();
     }
 }

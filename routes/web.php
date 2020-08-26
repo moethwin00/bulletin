@@ -18,32 +18,45 @@ Route::get('/', 'Post\PostController@index');
 
 Auth::routes();
 
-Route::get('/posts', 'Post\PostController@index') -> name('posts');
+Route::group(['prefix' => 'posts'], function() {
+    Route::get('/', 'Post\PostController@index')->name('posts#index');
+    Route::post('search', 'Post\PostController@search')->name('posts#search');
+    Route::get('addpost', 'Post\PostController@create')->name('posts#create')->middleware('auth');
+    Route::post('confirmcreate', 'Post\PostController@confirmCreate')->name('posts#confirmCreate')->middleware('auth');
+    Route::post('store', 'Post\PostController@store')->name('posts#store')->middleware('auth');
+    Route::get('{id}/edit', 'Post\PostController@edit')->name('posts#edit')->middleware('auth');
+    Route::get('{id}/confirmedit', 'Post\PostController@confirmEdit')->name('posts#confirmEdit')->middleware('auth');
+    Route::post('{id}/confirmedit', 'Post\PostController@confirmEdit')->name('posts#confirmEdit')->middleware('auth');
+    Route::post('{id}/update', 'Post\PostController@update')->name('posts#update')->middleware('auth');
+    Route::get('{id}/delete', 'Post\PostController@delete')->name('posts#delete')->middleware('auth');
+    Route::get('uploadcsv', 'Post\PostController@showUpload')->name('posts#showUpload')->middleware('auth');
+    Route::get('download', 'Post\PostController@download')->name('posts#download')->middleware('auth');
+    Route::get('upload', 'Post\PostController@upload')->name('posts#upload')->middleware('auth');
+    Route::post('upload', 'Post\PostController@upload')->name('posts#upload')->middleware('auth');
+});
 
-Route::post('/posts/search', 'Post\PostController@search') -> name('posts.search');
+//User and Admin Only
+Route::middleware('can:isAdmin')->prefix('users')->group(function () {
+    // Mention all admin routes
+    Route::get('/', 'User\UserController@index') -> name('users#index') -> middleware('auth');
+    Route::post('search', 'User\UserController@search') -> name('users#search');
+    Route::post('confirmcreate', 'User\UserController@confirmCreate') -> name('users#confirmCreate') -> middleware('auth');
+    Route::post('register', 'User\UserController@store') -> name('users#store') -> middleware('auth');
+    Route::get('{id}/delete', 'User\UserController@delete') -> name('users#delete') -> middleware('auth');
+});
 
-Route::get('/posts/addpost', 'Post\PostController@create') -> name('posts.addPost') -> middleware('auth');
+Route::group(['prefix' => 'users'], function() {
+    Route::get('{id}/edit', 'User\UserController@edit') -> name('users#edit') -> middleware('auth');
+    Route::get('{id}/confirmedit', 'User\UserController@confirmEdit') -> name('users#confirmEdit') -> middleware('auth');
+    Route::post('{id}/confirmedit', 'User\UserController@confirmEdit') -> name('users#confirmEdit') -> middleware('auth');
+    Route::post('{id}/update', 'User\UserController@update') -> name('users#update') -> middleware('auth');
+    Route::get('profile', 'User\UserController@showProfile') -> name('users#showProfile') -> middleware('auth');
+});
 
-Route::post('/posts/confirmcreate', 'Post\PostController@confirmCreate') -> name('posts.confirmCreate') -> middleware('auth');
-
-Route::post('/posts/store', 'Post\PostController@store') -> name('posts.store') -> middleware('auth');
-
-Route::get('/posts/{id}/edit', 'Post\PostController@edit') -> name('posts.editPost') -> middleware('auth');
-
-Route::any('/posts/{id}/confirmedit', 'Post\PostController@confirmEdit') -> name('posts.confirmEdit') -> middleware('auth');
-
-Route::post('/posts/{id}/update', 'Post\PostController@update') -> name('posts.update') -> middleware('auth');
-
-Route::get('/users', 'User\UserController@index') -> name('users') -> middleware('auth');
-
-Route::post('/users/search', 'User\UserController@search') -> name('users.search');
-
-Route::post('/users/confirmcreate', 'User\UserController@confirmCreate') -> name('users.confirmCreate') -> middleware('auth');
-
-Route::post('/users/register', 'User\UserController@store') -> name('users.register') -> middleware('auth');
-
-Route::get('/users/{id}/edit', 'User\UserController@edit') -> name('users.editUser') -> middleware('auth');
-
-Route::post('/users/{id}/confirmedit', 'User\UserController@confirmEdit') -> name('users.confirmEdit') -> middleware('auth');
+Route::group(['prefix' => 'password'], function() {
+    Route::get('{id}/reset', 'Auth\PasswordController@edit')->name('password#edit')->middleware('auth');
+    Route::get('{id}/update', 'Auth\PasswordController@update')->name('password#update')->middleware('auth');
+    Route::post('{id}/update', 'Auth\PasswordController@update')->name('password#update')->middleware('auth');
+});
 
 ?>
